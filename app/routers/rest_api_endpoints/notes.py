@@ -66,7 +66,6 @@ async def update_note(
     }
 
 
-
 @router.delete('/notes', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_note(note_id: str, service: NotesService = Depends()):
     await service.delete_note(note_id)

@@ -1,4 +1,3 @@
-from google import genai
 from langchain_google_genai import ChatGoogleGenerativeAI
 
 from app.core.config import config
