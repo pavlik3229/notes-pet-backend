@@ -79,3 +79,4 @@ cython_debug/
 
 .ipynb
 .md
+.idea
