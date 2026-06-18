@@ -7,12 +7,10 @@ authors = [
 ]
 requires-python =  ">=3.14,<4.0.0"
 dependencies = [
-    "ruff (>=0.15.14,<0.16.0)",
     "pydantic (>=2.13.4,<3.0.0)",
     "httpx (>=0.28.1,<0.29.0)",
     "elasticsearch (>=9.4.1,<10.0.0)",
     "aiohttp (>=3.14.0,<4.0.0)",
-    "notebook (>=7.5.6,<8.0.0)",
     "fastapi (>=0.136.3,<0.137.0)",
     "uvicorn (>=0.49.0,<0.50.0)",
     "google-genai (>=2.8.0,<3.0.0)",
@@ -21,13 +19,20 @@ dependencies = [
     "strawberry-graphql[cli] (>=0.316.0,<0.317.0)"
 ]
 
+[dependency-groups]
+dev = [
+    "pre-commit (>=4.6.0,<5.0.0)",
+    "notebook (>=7.5.6,<8.0.0)",
+    "ruff (>=0.15.14,<0.16.0)",
+]
+
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 
-[tools.ruff]
+[tool.ruff]
 exclude = [
     ".git",
     ".venv",
@@ -35,3 +40,4 @@ exclude = [
 ]
 [tool.ruff.format]
 quote-style = "single"
+
