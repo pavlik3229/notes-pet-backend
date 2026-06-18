@@ -5,14 +5,17 @@ from pydantic_settings import SettingsConfigDict, BaseSettings
 
 class Config(BaseSettings):
     DEBUG: bool = True
-    GOOGLE_AI_API_KEY: str | None
+
+    GOOGLE_AI_API_KEY: str | None = None
+    PROJECT_NAME: str
+    PROJECT_NUMBER: str
 
     ELASTICSEARCH_URL: str = 'http://localhost:9200'
     NOTES_INDEX_NAME: str = 'notes'
 
     MIN_CONTENT_LENGTH_FOR_AI_ENRICHMENT: int = 100
 
-    model_config = SettingsConfigDict(env_file='.env')
+    model_config = SettingsConfigDict(env_file='.env', extra='ignore')
 
 
 @lru_cache
