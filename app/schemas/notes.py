@@ -1,7 +1,6 @@
 import datetime
 
-from prometheus_client import Summary
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class NoteCreate(BaseModel):

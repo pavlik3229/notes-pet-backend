@@ -1,4 +1,3 @@
-from fastapi.params import Depends
 import logging
 
 from app.llms.enrichment_pipeline import NoteEnrichPipe
