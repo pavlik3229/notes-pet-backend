@@ -1,0 +1,23 @@
+from functools import lru_cache
+
+from pydantic_settings import SettingsConfigDict, BaseSettings
+
+
+class Config(BaseSettings):
+    DEBUG: bool = True
+    GOOGLE_AI_API_KEY: str | None
+
+    ELASTICSEARCH_URL: str = 'http://localhost:9200'
+    NOTES_INDEX_NAME: str = 'notes'
+
+    MIN_CONTENT_LENGTH_FOR_AI_ENRICHMENT: int = 100
+
+    model_config = SettingsConfigDict(env_file='.env')
+
+
+@lru_cache
+def get_config() -> Config:
+    return Config()
+
+
+config = get_config()

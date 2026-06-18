@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend-service:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - ./app:/src/app
+    networks:
+      - es-net
+    ports:
+      - "8000:8000"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  elasticsearch:
+    image: elasticsearch:9.4.1
+    container_name: elasticsearch_local
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false  # Disable authorization for local tests
+    ports:
+      - "9200:9200"
+    expose:
+        - "9200"
+    networks:
+      - es-net
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sSf 'http://127.0.0.1:9200/_cluster/health?wait_for_status=yellow&timeout=5s' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+networks:
+  es-net:
+    driver: bridge
+
+volumes:
+  es_data:
+    driver: local
