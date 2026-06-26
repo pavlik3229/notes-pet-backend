@@ -80,10 +80,10 @@ class NotesRepo:
             logger.error(f'Error updating record with id {doc_id} in database: {e}')
             return False
 
-    async def get_all_notes(self) -> list[dict]:
+    async def get_all_notes(self, limit: int = 20, offset: int = 0) -> list[dict]:
         """
-        Retrieves all note documents from the Elasticsearch index.
-        Returns a list of dicts, each containing the document data and its ID under the key 'doc_id'.
+        Retrieves all note documents from the Elasticsearch index with pagination.
+        Returns a list of note documents, each represented as a dictionary.
         """
         results = []
 
@@ -91,7 +91,8 @@ class NotesRepo:
             response = await self.db.search(
                 index=self.config.NOTES_INDEX_NAME,
                 query={'match_all': {}},
-                size=100,
+                size=limit,
+                from_=offset,
             )
             logger.info('All notes retrieved from database successfully')
 
