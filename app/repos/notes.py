@@ -1,16 +1,23 @@
 import logging
 
 from elasticsearch import AsyncElasticsearch, NotFoundError
+from fastapi import Depends
 
-from app.core.config import Config
+from app.core.config import get_config
+from app.core.elastic_context import get_es
 from app.schemas import NotePreAiDTO
 from app.schemas.notes import NotePostAiDTO
 
 logger = logging.getLogger(__name__)
+config = get_config()
+
+
+def get_notes_repo(db: AsyncElasticsearch = Depends(get_es)):
+    return NotesRepo(db=db)
 
 
 class NotesRepo:
-    def __init__(self, config: Config, db: AsyncElasticsearch):
+    def __init__(self, db: AsyncElasticsearch):
         self.config = config
         self.db = db
 

@@ -4,7 +4,7 @@ from ..core.elastic_context import es_client as es
 
 
 async def create_index():
-    response = await es.indices.create(
+    await es.indices.create(
         index=config.NOTES_INDEX_NAME, settings=index_settings, mappings=note_mapping
     )
 

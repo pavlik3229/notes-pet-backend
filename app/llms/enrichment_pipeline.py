@@ -3,25 +3,21 @@ import logging
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 
-from app.core.config import get_config, Config
+from app.core.config import get_config
 from app.core.gemini_client import get_llm
 from app.schemas import NotePreAiDTO
 from app.schemas.notes import NotePostAiDTO, SummaryResponse
 
 logger = logging.getLogger(__name__)
+config = get_config()
 
 
 class NoteEnrichPipe:
-    def __init__(
-        self,
-        config: Config = Depends(get_config),
-        llm_client: ChatGoogleGenerativeAI = Depends(get_llm),
-    ):
+    def __init__(self, llm_client: ChatGoogleGenerativeAI = Depends(get_llm)):
         self.config = config
         self.llm_client = llm_client
 
     async def process(self, note: NotePreAiDTO) -> NotePostAiDTO:
-
         logger.info(f'Starting enrichment for note with id {note.doc_id}')
 
         summary = None
@@ -42,7 +38,6 @@ class NoteEnrichPipe:
         return enriched_note
 
     async def _summary(self, note: NotePreAiDTO) -> str | None:
-
         structured_llm = self.llm_client.with_structured_output(
             SummaryResponse, method='json_schema'
         )

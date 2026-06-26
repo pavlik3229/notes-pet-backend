@@ -3,20 +3,23 @@ import logging
 import uuid
 from fastapi import Depends
 
-from app.core.config import Config, get_config
-from app.repos.notes import NotesRepo
+from app.core.config import get_config
+from app.repos.notes import NotesRepo, get_notes_repo
 from app.schemas import NoteCreate, NotePreAiDTO
 from app.schemas.notes import NotePostAiDTO
 
 logger = logging.getLogger(__name__)
+config = get_config()
+
+
+def get_notes_service(
+    repo: NotesRepo = Depends(get_notes_repo),
+):
+    return NotesService(repo=repo)
 
 
 class NotesService:
-    def __init__(
-        self,
-        config: Config = Depends(get_config),
-        repo: NotesRepo = Depends(),
-    ):
+    def __init__(self, repo: NotesRepo):
         self.config = config
         self.repo = repo
 
@@ -24,7 +27,7 @@ class NotesService:
         note = NotePreAiDTO(
             **note.model_dump(),
             doc_id=self._create_id(),
-            created_at=datetime.datetime.utcnow(),
+            created_at=datetime.datetime.now(datetime.UTC),
         )
 
         logger.info(f'Creating note with id {note.doc_id}')
@@ -47,9 +50,12 @@ class NotesService:
 
         return doc
 
-    async def get_all_notes(self) -> list[NotePostAiDTO]:
-
-        return [NotePostAiDTO(**doc) for doc in await self.repo.get_all_notes()]
+    async def get_all_notes(
+        self, limit: int = 20, offset: int = 0
+    ) -> list[NotePostAiDTO]:
+        return [
+            NotePostAiDTO(**doc) for doc in await self.repo.get_all_notes(limit, offset)
+        ]
 
     async def update_note(
         self, note_id: str, title: str | None, content: str | None
