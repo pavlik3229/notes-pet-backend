@@ -6,6 +6,8 @@ from pydantic_settings import SettingsConfigDict, BaseSettings
 class Config(BaseSettings):
     DEBUG: bool = True
 
+    FRONTEND_URL: str = 'http://localhost:5173'
+
     GOOGLE_AI_API_KEY: str | None = None
     PROJECT_NAME: str
     PROJECT_NUMBER: str
