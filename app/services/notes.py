@@ -7,6 +7,7 @@ from app.core.config import get_config
 from app.repos.notes import NotesRepo, get_notes_repo
 from app.schemas import NoteCreate, NotePreAiDTO
 from app.schemas.notes import NotePostAiDTO
+from app.llms.search_embedding import create_embedding
 
 logger = logging.getLogger(__name__)
 config = get_config()
@@ -74,6 +75,38 @@ class NotesService:
 
     async def delete_note(self, note_id: str) -> bool:
         return await self.repo.delete_doc(note_id)
+
+    async def hybrid_search(
+        self, title: str | None, content: str, limit: int = 20, offset: int = 0
+    ) -> list[NotePostAiDTO]:
+        search_query = title + '. ' + content if title else content
+        search_embedding = None
+        for i in range(3):
+            search_embedding = await create_embedding(search_query)
+
+            logger.info('Performing hybrid search with embedding attempt %d', i + 1)
+            if search_embedding is not None:
+                logger.info(
+                    'Hybrid search embedding created successfully on attempt %d', i + 1
+                )
+                break
+
+        if search_embedding is None:
+            logger.error('Failed to create embedding for search')
+            return []
+
+        try:
+            docs = await self.repo.hybrid_search(
+                search_query=search_query,
+                search_embedding=search_embedding,
+                limit=limit,
+                offset=offset,
+            )
+        except Exception as e:
+            logger.error(f'Hybrid search failed: {e}')
+            return []
+
+        return [NotePostAiDTO(**doc) for doc in docs]
 
     @staticmethod
     def _create_id():
