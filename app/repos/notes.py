@@ -136,3 +136,47 @@ class NotesRepo:
         Returns a tuple containing the dict and the document ID.
         """
         return note.model_dump(exclude={'doc_id'}), note.doc_id
+
+    def _get_hybrid_search_query(
+        self,
+        search_query: str,
+        search_embedding: list,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> dict:
+        """
+        Constructs a top-level Elasticsearch Retriever API payload for hybrid search.
+
+        Combines standard text search (BM25) and kNN vector search using Reciprocal
+        Rank Fusion (RRF). Dynamically scales window and candidates for pagination.
+        """
+        window = max(50, limit + offset)
+        num_candidates = max(100, (limit + offset) * 2)
+
+        return {
+            'retriever': {
+                'rrf': {
+                    'retrievers': [
+                        {
+                            'standard': {
+                                'query': {
+                                    'multi_match': {
+                                        'query': search_query,
+                                        'fields': ['title^3', 'content'],
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            'knn': {
+                                'field': 'combined_vector',
+                                'query_vector': search_embedding,
+                                'num_candidates': num_candidates,
+                            }
+                        },
+                    ],
+                    'rank_constant': 20,
+                    'rank_window_size': window,
+                }
+            }
+        }
