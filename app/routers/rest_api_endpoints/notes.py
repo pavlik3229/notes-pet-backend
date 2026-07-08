@@ -26,19 +26,13 @@ async def create_note(
 
     logger.info('Adding enrichment task to background tasks')
     background_tasks.add_task(run_note_ai_enrichment, result, notes_repo, ai_pipeline)
+
     return {
         'doc_id': result.doc_id,
         'status': 'pending',
         'message': 'Enrichment started',
         'status_code': status.HTTP_201_CREATED,
     }
-
-
-@router.get('/notes/{note_id}', response_model=NoteOut)
-async def get_note(note_id: str, service: NotesService = Depends(get_notes_service)):
-    result = await service.get_note(note_id)
-
-    return result
 
 
 @router.get('/notes', response_model=NoteListResponse)
@@ -98,3 +92,10 @@ async def update_note(
 @router.delete('/notes', status_code=status.HTTP_204_NO_CONTENT)
 async def delete_note(note_id: str, service: NotesService = Depends(get_notes_service)):
     await service.delete_note(note_id)
+
+
+@router.get('/notes/{note_id}', response_model=NoteOut)
+async def get_note(note_id: str, service: NotesService = Depends(get_notes_service)):
+    result = await service.get_note(note_id)
+
+    return result
