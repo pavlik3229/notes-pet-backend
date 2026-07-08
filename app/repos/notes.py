@@ -106,6 +106,38 @@ class NotesRepo:
             logger.error(f'Error retrieving all notes from database: {e}')
             return results
 
+    async def hybrid_search(
+        self,
+        search_query: str,
+        search_embedding: list,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> list[dict]:
+        results = []
+
+        try:
+            search_body = self._get_hybrid_search_query(
+                search_query, search_embedding, limit=limit, offset=offset
+            )
+
+            response = await self.db.search(
+                index=self.config.NOTES_INDEX_NAME,
+                size=limit,
+                from_=offset,
+                **search_body,
+            )
+            logger.info('Hybrid search completed successfully')
+
+            for hit in response.body['hits']['hits']:
+                doc = hit['_source']
+                doc['doc_id'] = hit['_id']
+                results.append(doc)
+            return results
+
+        except Exception as e:
+            logger.error(f'Error performing hybrid search in database: {e}')
+            return results
+
     async def delete_doc(self, doc_id: str) -> bool:
         """
         Deletes a note document from the Elasticsearch index by its ID.
