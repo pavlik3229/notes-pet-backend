@@ -12,10 +12,6 @@ logger = logging.getLogger(__name__)
 config = get_config()
 
 
-def get_notes_repo(db: AsyncElasticsearch = Depends(get_es)):
-    return NotesRepo(db=db)
-
-
 class NotesRepo:
     def __init__(self, db: AsyncElasticsearch):
         self.config = config
@@ -212,3 +208,7 @@ class NotesRepo:
                 }
             }
         }
+
+
+def get_notes_repo(db: AsyncElasticsearch = Depends(get_es)) -> NotesRepo:
+    return NotesRepo(db=db)

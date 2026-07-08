@@ -1,7 +1,7 @@
 import datetime
 import logging
 import uuid
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 
 from app.core.config import get_config
 from app.repos.notes import NotesRepo, get_notes_repo
@@ -45,7 +45,10 @@ class NotesService:
         return note
 
     async def get_note(self, note_id: str) -> dict:
-        doc_id, doc = await self.repo.get_doc(note_id)
+        result = await self.repo.get_doc(note_id)
+        if result is None:
+            raise HTTPException(status_code=404, detail=f'Note {note_id} not found')
+        doc_id, doc = result
 
         doc['doc_id'] = doc_id
 
