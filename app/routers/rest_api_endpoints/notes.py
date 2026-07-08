@@ -53,6 +53,22 @@ async def get_all_notes(
     }
 
 
+@router.get('/notes/search', response_model=NoteListResponse)
+async def hybrid_search(
+    content: str,
+    title: str | None = None,
+    limit: int = 20,
+    offset: int = 0,
+    service: NotesService = Depends(get_notes_service),
+):
+    result = await service.hybrid_search(title, content, limit, offset)
+
+    return {
+        'count': len(result),
+        'notes': result,
+    }
+
+
 @router.patch('/notes', response_model=NoteOut)
 async def update_note(
     update_data: NoteUpdatePayload,
