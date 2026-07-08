@@ -51,3 +51,10 @@ class NoteUpdatePayload(BaseModel):
 class NoteListResponse(BaseModel):
     count: int
     notes: list[NotePostAiDTO]
+
+
+class CreateOut(BaseModel):
+    doc_id: str
+    status: str
+    message: str
+    status_code: int

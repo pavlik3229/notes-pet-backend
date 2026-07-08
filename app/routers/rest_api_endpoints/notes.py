@@ -6,14 +6,14 @@ from app.backgroung_tasks.upload_notes import run_note_ai_enrichment
 from app.llms.enrichment_pipeline import NoteEnrichPipe
 from app.repos.notes import NotesRepo, get_notes_repo
 from app.schemas import NoteCreate, NoteOut
-from app.schemas.notes import NoteUpdatePayload, NoteListResponse
+from app.schemas.notes import NoteUpdatePayload, NoteListResponse, CreateOut
 from app.services.notes import NotesService, get_notes_service
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
 
-@router.post('/notes')
+@router.post('/notes', response_model=CreateOut)
 async def create_note(
     note: NoteCreate,
     background_tasks: BackgroundTasks,
